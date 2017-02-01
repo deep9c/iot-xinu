@@ -1,0 +1,29 @@
+<cloudddl>       
+	<device>
+		<id>button.sense</id>		
+		<association>
+            <val>1</val>                
+            <dependency>
+                <name>temp.sense</name>				
+            </dependency>
+		</association>
+	</device>		
+	<device>
+		<id>temp.sense</id>
+		<association>
+            <val>70</val>                
+            <dependency>
+                <name>LED_rgb.gnd_r#0</name>				
+            </dependency>
+			<dependency>
+                <name>LED_rgb.gnd_g#1</name>				
+            </dependency>
+			<dependency>
+                <name>LED_rgb.gnd_b#0</name>				
+            </dependency>
+			<dependency>
+                <name>LED_rgb.gnd_r1#0</name>				
+            </dependency>
+		</association>
+	</device>
+</cloudddl>

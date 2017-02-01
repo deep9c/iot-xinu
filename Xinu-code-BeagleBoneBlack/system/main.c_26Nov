@@ -1,0 +1,193 @@
+/*  main.c  - main */
+
+#include <xinu.h>
+#include <string.h>
+#include <gpio.h>
+int producer_id, consumer_id1, consumer_id2, consumer_id3;
+
+struct gpio_csreg *pgcsr;           /* pointer to gpio registers     */
+uint32 offset;
+uint32  p;
+uint32	ipaddr;
+char	str[128];
+#define GPIO1_START_ADDR 0x4804C000
+#define GPIO1_END_ADDR   0x4804e000
+#define GPIO1_SIZE (GPIO1_END_ADDR - GPIO1_START_ADDR)
+
+
+
+#define GPIO_SETDATAOUT 0x194
+#define GPIO_CLEARDATAOUT 0x190
+
+#define USR3 (1<<24)
+
+process	main(void)
+{
+	recvclr();
+	//sendedgedata(1);
+
+
+	
+	net_init();
+	kprintf("\n net_init called \n");
+	
+	ipaddr = getlocalip();
+	kprintf("\n getlocalip called \n");
+	if ((int32)ipaddr == SYSERR) {
+		kprintf("Cannot obtain an IP address\n");
+	} else {
+		kprintf("\n obtained IP \n");
+		/* Print the IP in dotted decimal and hex */
+		ipaddr = NetData.ipucast;
+		sprintf(str, "%d.%d.%d.%d",
+			(ipaddr>>24)&0xff, (ipaddr>>16)&0xff,
+			(ipaddr>>8)&0xff,        ipaddr&0xff);
+	
+		kprintf("Obtained IP address  %s   (0x%08x)\n", str,
+								ipaddr);
+	}
+
+
+	kprintf("Inside main \n");
+	gpiowrite(P9_15,1);
+
+
+
+	/*unsigned long *	mControlModule;
+	unsigned long * m_gpio;
+	unsigned long * m_gpio1;
+	unsigned long * m_gpio2;
+	unsigned long * m_gpio3;
+	kprintf("\nSwitching on led!!!\n");
+	mControlModule = (unsigned long *)(GPIO_CONTROL_REG+0x0844);
+	m_gpio = (unsigned long *)(GPIO_BASE+0x134);
+	m_gpio1 = (unsigned long *)(GPIO_BASE+0x13C);
+	*mControlModule |= 0x07;
+	unsigned long v = 0x1 << 17;
+	*m_gpio &= ~v; // direction = out
+
+  	unsigned long v1 = (1 & 0x01) << 17;
+  	unsigned long mask = 0x1 << 17;
+	//*m_gpio2 = (unsigned long *)(GPIO_BASE+0x34);
+	//*m_gpio3 = (unsigned long *)(GPIO_BASE+0x38);
+	//*m_gpio2 |= mask;
+	//*m_gpio3 |= mask;
+		//m_gpio[GPIO_Pin_Bank[_pin]][kIRQSTATUS_SET_0/4] |= v;
+		//m_gpio[GPIO_Pin_Bank[_pin]][kIRQSTATUS_SET_1/4] |= v;
+  	// Remove bit
+  	*m_gpio1 &= ~mask;
+  	// Assign new bit value
+  	*m_gpio1 |= v1;*/
+
+	//m_gpio[1][0x194/4] |= v;
+	//while(1){
+
+	//}
+	//offset = 1 << 17;
+	//gpioLEDOn(offset);
+	kprintf("\nAfter Switching on led!!!\n");
+	//pgcsr = (struct gpio_csreg *)GPIO_BASE;
+	
+/*
+volatile void *gpio_addr;
+volatile unsigned int *gpio_setdataout_addr;
+volatile unsigned int *gpio_cleardataout_addr;
+
+gpio_setdataout_addr   = GPIO_BASE + GPIO_SETDATAOUT;
+gpio_cleardataout_addr = GPIO_BASE + GPIO_CLEARDATAOUT;
+
+         kprintf("PIN MODE   INPUT   OUTPUT  CONTROL\n");
+         kprintf( "--- ------ ------- ------- -------\n");
+	 p = 17;
+         //for (p = 0; p < GPIO_PIN_COUNT; p++)
+         //{
+                 offset = 1 << p;
+                 kprintf( "%2d ", p);
+                 if (pgcsr->gp_enable & offset)
+                 { kprintf(" Output "); }
+                 else
+                 { kprintf( " Input  "); }
+                 kprintf("   %1d    ", (pgcsr->gp_input & offset) >> p);
+                 kprintf("   %1d    ", (pgcsr->gp_output & offset) >> p);
+                 kprintf( "   %1d    ", (pgcsr->gp_control & offset) >> p);
+                 kprintf("\n");
+
+         //}	
+		//kprintf("new address %d\n",gpio_setdataout_addr);		
+		offset = 1 << p;
+		uint32 val1 = ((struct gpio_csreg *)GPIO_BASE)->gp_output;
+		kprintf("gp_output val1 %d\n",val1);
+		gpioLEDOn(offset);
+		((struct gpio_csreg *)GPIO_BASE)->gp_output |= offset;
+	       	uint32 val2 = ((struct gpio_csreg *)GPIO_BASE)->gp_output;
+		kprintf("gp_output val2 %d\n",val2);
+		kprintf( "%2d ", p);
+		if (pgcsr->gp_enable & offset)
+                 { kprintf(" Output "); }
+                 else
+                 { kprintf( " Input  "); }
+                 kprintf("   %1d    ", (pgcsr->gp_input & offset) >> p);
+                 kprintf("   %1d    ", (pgcsr->gp_output & offset) >> p);
+                 kprintf( "   %1d    ", (pgcsr->gp_control & offset) >> p);
+                 kprintf("\n");	
+
+	kprintf("\nevent handling started\n\n");
+
+        kprintf("PIN MODE   INPUT   OUTPUT  CONTROL\n");
+         kprintf( "--- ------ ------- ------- -------\n");
+         for (p = 0; p < GPIO_PIN_COUNT; p++)
+         {
+                 offset = 1 << p;
+                 kprintf( "%2d ", p);
+                 if (pgcsr->gp_enable & offset)
+                 { kprintf(" Output "); }
+                 else
+                 { kprintf( " Input  "); }
+                 kprintf("   %1d    ", (pgcsr->gp_input & offset) >> p);
+                 kprintf("   %1d    ", (pgcsr->gp_output & offset) >> p);
+                 kprintf( "   %1d    ", (pgcsr->gp_control & offset) >> p);
+                 kprintf("\n");
+
+         }
+*/
+	unsigned long *	mControlModule;
+	unsigned long * m_gpio;
+	unsigned long * m_gpio1;
+	unsigned long *	m_gpio2;
+	unsigned long *	m_gpio3;
+	/*uint32 pins[] = {17}; // Need to be included in ddl
+	uint32 pin_num = 1; // need to be in ddl
+	int i;
+	// Enabling the PINS for GPIO: pin mode changed to 7
+	for(i=0; i< pin_num; i++){
+		mControlModule = (unsigned long *)(GPIO_CONTROL_REG+0x0844);
+		*mControlModule |= 0x07;
+				
+	}
+	unsigned long mask = 0x1 << 17;
+	
+	*m_gpio = (unsigned long *)(GPIO_BASE+0x134); // kOE input
+	*m_gpio |= mask;
+
+	*m_gpio2 = (unsigned long *)(GPIO_BASE+0x34);
+	*m_gpio3 = (unsigned long *)(GPIO_BASE+0x38);
+	*m_gpio3 = (unsigned long *)(GPIO_BASE+kLEVELDETECT1);
+	
+	*m_gpio2 |= mask;
+	*m_gpio3 |= mask;
+	int32 status = 0;
+	unsigned long *	m_gpio4;
+	unsigned long *	m_gpio5;
+	*m_gpio4 = (unsigned long *)(GPIO_BASE+0x2C);
+	*m_gpio5 = (unsigned long *)(GPIO_BASE+0x30);*/
+	/*while(1) {
+		while( ~((*m_gpio4)&(0x01<<17)));
+		*m_gpio1 = (unsigned long *)(GPIO_BASE+0x138);
+		kprintf("INPUT GPIO VALUE %x\n",m_gpio1);
+	}*/
+	resched_cntl(DEFER_STOP);
+	//kprintf("\nmessages received\n");
+	return OK;
+}
+
+

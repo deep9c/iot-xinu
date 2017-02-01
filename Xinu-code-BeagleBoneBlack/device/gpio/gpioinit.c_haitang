@@ -1,0 +1,71 @@
+/* gpioinit.c - gpioinit */
+
+#include <xinu.h>
+#include <gpio.h>
+
+
+/*------------------------------------------------------------------------
+ *  gpioinit  -  Initialize gpio pns for a gpio device
+ *------------------------------------------------------------------------
+ */
+devcall	gpioinit(struct dentry	*devptr)
+{
+	kprintf("gpio initialize\r\n");
+	unsigned long *	mControlModule;
+	unsigned long * m_gpio;
+	unsigned long * m_gpio1;
+	unsigned long *	m_gpio2;
+	unsigned long *	m_gpio3;
+	uint32 pins[] = {16}; // Need to be included in ddl
+	uint32 pin_num = 1; // need to be in ddl
+	int i;
+	// Enabling the PINS for GPIO: pin mode changed to 7
+	for(i=0; i< pin_num; i++)
+	{
+		mControlModule = (unsigned long *)(GPIO_CONTROL_REG+0x0844);
+		*mControlModule |= 0x07;
+	}
+	unsigned long mask = 0x1 << 17;
+	
+	m_gpio = (unsigned long *)(GPIO_BASE+0x134); // kOE input
+	*m_gpio |= mask;
+
+	unsigned long* irqEnable0 = (unsigned long *)(GPIO_BASE+0x34);			//IRQ enable 0
+	unsigned long* irqEnable1 = (unsigned long *)(GPIO_BASE+0x38);			//IRQ enable 0
+	unsigned long* risingDetect = (unsigned long *)(GPIO_BASE+0x148);		//rising detection
+	unsigned long* fallingDetect = (unsigned long *)(GPIO_BASE+0x14C);		//falling detection
+
+	unsigned long* sysConfig = (unsigned long *)(GPIO_BASE+0x10);		//falling detection
+
+
+	unsigned long *	highLevelDection = (unsigned long *)(GPIO_BASE+kLEVELDETECT1); //enable IRQ for high level detection
+	*sysConfig |= 0x01;
+
+	*irqEnable0 |= mask;
+	*irqEnable1 |= mask;
+	*risingDetect |= mask;
+	*fallingDetect |= mask; 
+	//*highLevelDection |= mask;
+	
+	
+
+	//*m_gpio1 = (unsigned long *)((GPIO_BASE+0x138) & (0x1 << bit) >> bit);
+	//*m_gpio1 = (*m_gpio1 & (0x1 << bit)) >> bit;
+	
+	
+	//return (m_gpio[GPIO_Pin_Bank[_pin]][kDATAIN/4] & (0x1 << bit)) >> bit;
+	InitialGPIOInterrupt(devptr);
+	kprintf("GPIO init complete !!! \n");
+	return OK;
+}
+
+void InitialGPIOInterrupt(struct	dentry *devptr)
+{
+	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;   //get intr control register start address
+	csrptr->threshold = 0X0FF;                                      //disable the priority threshold
+	set_evec(devptr->dvirq, (uint32)devptr->dvintr);                //register the interrupt handler and priority
+	kprintf("devptr->dvirq is %d\n",devptr->dvirq);
+	csrptr->ilr[devptr->dvirq] &= ~(0x01);                          //set ADC to IRQ interrupt
+	csrptr->ilr[devptr->dvirq] |= (0x0B<<2);                        //priority is 10	 
+
+}

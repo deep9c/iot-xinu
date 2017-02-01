@@ -1,0 +1,40 @@
+
+Xinu for bbb -- version #1  (comer)  Mon Aug 29 16:29:15 EDT 2016
+
+Cannot reset Ethernet PHY
+ 519813376 bytes of free memory.  Free list:
+           [0x8103E700 to 0x9FFF9FFF]
+     84456 bytes of Xinu code.
+           [0x81000000 to 0x810149E7]
+    131980 bytes of data.
+           [0x81015000 to 0x8103538B]
+
+:psUnhandled exception. Link Register: 0x81007228
+
+panic: **** EXCEPTION ****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

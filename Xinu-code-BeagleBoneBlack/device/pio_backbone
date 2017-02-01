@@ -1,0 +1,38 @@
+#include <xinu.h>
+#include <gpio.h>
+#include <gpio_f.h>
+#include <string.h>
+
+int32 iot_write_pin(int32 d_index, int32 data){
+	switch(d_index){ 
+		#include <ddl_io_out.inc>
+		default:
+			break;
+	}
+	return 1;
+
+}
+
+
+	
+int32 gpio_init_ddl (){
+#include <ddl_io_numpins.inc>
+	struct gpiopinconfig gpioinitblk;
+	struct gpiopinconfig gpiotab[num_pins];
+	Beagle_GPIO_Status status;
+	Beagle_GPIO_Status status_out;
+	int i;
+#include <ddl_io_init.inc>	
+	for(i=0; i<num_pins; i++) {
+		if(gpiotab[i].direction == kINPUT){
+			int32 input_pinid = getgpiopin(gpiotab[i]._pinindex);//7=P9_23
+			status = configurePin(input_pinid,kINPUT);
+			enablePinInterrupts( input_pinid, gpiotab[i].isInterruptEnabled );
+		} else if(gpiotab[i].direction == kOUTPUT){
+			int32 output_pinid = getgpiopin(gpiotab[i]._pinindex);//0=P9_15;
+			status = configurePin(output_pinid,kOUTPUT);
+		}
+		
+	}
+	return kSuccess;
+}

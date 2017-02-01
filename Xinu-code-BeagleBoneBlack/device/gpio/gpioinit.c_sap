@@ -1,0 +1,99 @@
+/* gpioinit.c - gpioinit */
+
+#include <xinu.h>
+#include <gpio.h>
+
+
+/*------------------------------------------------------------------------
+ *  gpioinit  -  Initialize gpio pns for a gpio device
+ *------------------------------------------------------------------------
+ */
+devcall	gpioinit(
+	  struct dentry	*devptr		/* Entry in device switch table	*/
+	)
+{
+	unsigned long *	mControlModule;
+	unsigned long * m_gpio;
+	unsigned long * m_gpio1;
+	unsigned long *	m_gpio2;
+	unsigned long *	m_gpio3;
+	uint32 pins[] = {17}; // Need to be included in ddl
+	uint32 pin_num = 1; // need to be in ddl
+	int i;
+	// Enabling the PINS for GPIO: pin mode changed to 7
+	for(i=0; i< pin_num; i++){
+		mControlModule = (unsigned long *)(GPIO_CONTROL_REG+0x0844);
+		*mControlModule |= 0x07;
+				
+	}
+	unsigned long mask = 0x1 << 17;
+	
+	*m_gpio = (unsigned long *)(GPIO_BASE+0x134); // kOE input
+	*m_gpio |= mask;
+
+	*m_gpio2 = (unsigned long *)(GPIO_BASE+0x34);
+	*m_gpio3 = (unsigned long *)(GPIO_BASE+0x38);
+	*m_gpio3 = (unsigned long *)(GPIO_BASE+kLEVELDETECT1);
+	
+	*m_gpio2 |= mask;
+	*m_gpio3 |= mask;
+	
+	
+	unsigned long bit = 17;
+	//*m_gpio1 = (unsigned long *)((GPIO_BASE+0x138) & (0x1 << bit) >> bit);
+	//*m_gpio1 = (*m_gpio1 & (0x1 << bit)) >> bit;
+	
+	
+	//return (m_gpio[GPIO_Pin_Bank[_pin]][kDATAIN/4] & (0x1 << bit)) >> bit;
+	 InitialGPIOInterrupt(devptr);
+	kprintf("GPIO init complete !!! \n");
+	//struct	uart_csreg *uptr;	/* Address of UART's CSRs	*/
+
+	//typtr = &ttytab[ devptr->dvminor ];
+
+	/* Initialize values for gpio pin */
+
+	
+
+	/* Initialize the UART */
+
+	//uptr = (struct uart_csreg *)devptr->dvcsr;
+
+	/* Set baud rate */
+	//uptr->lcr = UART_LCR_DLAB;
+	//uptr->dlm = UART_DLM;
+	//uptr->dll = UART_DLL;
+
+	//uptr->lcr = UART_LCR_8N1;	/* 8 bit char, No Parity, 1 Stop*/
+	//uptr->fcr = 0x00;		/* Disable FIFO for now		*/
+
+	/* Register the interrupt dispatcher for the tty device */
+
+	//set_evec( devptr->dvirq, (uint32)devptr->dvintr );
+
+	/* Enable interrupts on the device: reset the transmit and	*/
+	/*   receive FIFOS, and set the interrupt trigger level		*/
+
+	//uptr->fcr = UART_FCR_EFIFO | UART_FCR_RRESET |
+	//		UART_FCR_TRESET | UART_FCR_TRIG2;
+
+	/* UART must be in 16x mode (TI AM335X specific) */
+
+	//uptr->mdr1 = UART_MDR1_16X;
+
+	/* Start the device */
+
+	//ttykickout(uptr);
+	return OK;
+}
+
+void InitialGPIOInterrupt(struct	dentry *devptr)
+{
+	struct	intc_csreg *csrptr = (struct intc_csreg *)0x48200000;   //get intr control register start address
+	csrptr->threshold = 0X0FF;                                      //disable the priority threshold
+	set_evec(devptr->dvirq, (uint32)devptr->dvintr);                //register the interrupt handler and priority
+	kprintf("devptr->dvirq is %d\n",devptr->dvirq);
+	csrptr->ilr[devptr->dvirq] &= ~(0x01);                          //set ADC to IRQ interrupt
+	csrptr->ilr[devptr->dvirq] |= (0x0B<<2);                        //priority is 10	 
+
+}

@@ -1,0 +1,11 @@
+/* ttyhandler.c - ttyhandler */
+
+#include <xinu.h>
+
+/*------------------------------------------------------------------------
+ *  ttyhandler  -  Handle an interrupt for a tty (serial) device
+ *------------------------------------------------------------------------
+ */
+void gpiohandler(uint32 xnum) {
+	kprintf("Calling gpio handler !!!\n");
+}

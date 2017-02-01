@@ -1,0 +1,30 @@
+<edgeddl>
+    <edgeid>0</edgeid>        
+	<bbb>
+            <bbid>1</bbid>                
+            <dev>
+                <id>LED_rgb.gnd_r</id>
+				<index>0</index>
+            </dev>
+            <dev>
+				<id>LED_rgb.gnd_g</id>
+				<index>1</index>
+            </dev>
+            <dev>
+				<id>LED_rgb.gnd_b</id>
+				<index>2</index>
+            </dev>
+			<dev>
+				<id>LED_rgb.gnd_r1</id>
+				<index>3</index>
+            </dev>
+            <dev>
+				<id>button.sense</id>
+				<index>7</index>
+            </dev>
+			<dev>
+				<id>temp.sense</id>
+				<index>5</index>
+            </dev>
+	</bbb>
+</edgeddl>
